@@ -1,0 +1,167 @@
+import java.io.*; // Needed to make Scanner available
+import java.util.*;
+
+class miniproject8 
+{
+    public static void main (String [] a) throws IOException
+    {
+        result();
+        System.exit(0);
+    }
+    public static int number_of_players()
+    {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("How many players are there");
+        String text_amount_of_players = scanner.nextLine(); 
+        int amount_of_players = Integer.parseInt(text_amount_of_players);
+        return amount_of_players;   
+    }
+    
+    public static String getquestion (Questions q)
+    { 
+        return q.question;
+    }
+    public static void setQuestion(Questions q, String QUESTION) 
+    { 
+        q.question = QUESTION;
+        return;
+    }
+    public static String [] getPossibleAnswers(Questions pa)
+    {
+        return pa.possibleAnswers;
+    }
+    public static void setPossibleAnswers(Questions pa, String [] possibleAnswers)
+    {
+        pa.possibleAnswers = possibleAnswers;
+        return;
+    }
+    public static int [] getScores(Questions s)
+    {
+        s.scores = scores;
+        return s.scores;
+    }
+    public static void setScores(Questions s, int [] scores)
+    {
+        s.scores = scores;
+    }
+    public static int getScoreQ(Questions arr, int i)
+    {
+        return arr.scores[i];
+    }
+    public static void setRecord(Questions number, String question, String [] possibleAnswers, int [] scores)
+    {
+        setQuestion(number, question);
+        setPossibleAnswers(number, possibleAnswers);
+        setScores(number, scores);
+        return;
+    }
+    public static Questions [] eachQuestions()
+    {
+        Questions Q1 = new Questions();
+        String question1 = "Who has the biggest land?";
+        String []  possibleAnswers1 = {"Bangladesh","Japan","Morroco","Spain"};
+        int [] scores1 ={0 , 3 , 5 , 10};
+        setRecord(Q1, question1, possibleAnswers1, scores1);
+        
+        Questions Q2 = new Questions();
+        String question2= "Which game is the most popular?";
+        String[] possibleAnswers2 = {"Fortnite","Minecraft","Assassin Creed","MW2"};
+        int [] scores2={0 , 3 , 5 , 10};
+        setRecord(Q2, question2, possibleAnswers2, scores2);
+        Questions [] records = {Q1,Q2};
+        return records;
+    }
+    public static int QUESTIONS (Questions pa, int score)
+    {
+        String [] choices = new String [4];
+        choices = getPossibleAnswers(pa);
+        final int amountOfChoices =4;
+        for (int i =0; i<amountOfChoices; i++)
+        {
+            System.out.println((i+1)+") " + choices[i]); //Prints the 4 choices
+        }
+        String answer = "";
+        Scanner scanner = new Scanner(System.in);
+        Boolean valid = false;
+            while (! valid)
+            {
+                answer = scanner.nextLine();
+                System.out.println();
+                for (int j=0; j<4; j++) //Loops through the user answer
+                {
+                    if (answer.toLowerCase().equals(choices[j].toLowerCase())|answer.equals(""+(j+1)+"")) //(j+1) means the number
+                        {
+                            System.out.println("You chose " + (j+1));
+                            score = score + getScoreQ(pa, j);
+                            valid = true;
+                        }
+                }
+            }
+            return score;
+    }
+    public static void result () throws IOException
+    {
+        String question = "";
+        
+        
+        //intro();   // This introduces the quiz
+        Scanner scanner = new Scanner(System.in);
+        int no_players = number_of_players();  // Asks user how many players are there
+        
+        //Record
+        Questions [] records = eachQuestions();
+        for (int i=1; i<=no_players; i++) 
+        {
+            System.out.println("What is the players name?");
+            String players_name = scanner.nextLine();
+            
+            int score = 0; //initially 0
+            for (int j=0;j<2;j++) // loops each questions
+            {
+                System.out.println(getquestion(records[j])); //Ask question 
+                score = QUESTIONS(records[j],score);  //
+            }
+            System.out.println(players_name + " has " + score);
+            System.out.println("Do you want to save score? PRESS ('Y')");
+            String savedScore = scanner.nextLine();
+            System.out.println("Do you want to load the previous score? PRESS ('Y') ");
+            String endScore= scanner.nextLine();
+            if (savedScore.toLowerCase().equals("y"))
+            {
+            storeScore(Integer.toString(score),players_name);
+            }
+            if (endScore.toLowerCase().equals("y"))
+            {
+                String [] mainLeaderboard = loadScore();
+                System.out.println("Previous player " + mainLeaderboard[0] + " had a score of " + mainLeaderboard[1]);
+            }  
+        }
+    }
+    public static void storeScore(String latestScore, String name) throws IOException
+    {
+        PrintWriter newScore = new PrintWriter  (new FileWriter("Leaderboard.txt"));
+        newScore.println(name + "," + latestScore);
+        newScore.close();
+        return;
+    }   
+    public static String [] loadScore() throws IOException
+    {
+        String [] previousPlayer = new String[2];
+        try {
+        BufferedReader getScore = new BufferedReader (new FileReader("Leaderboard.txt"));
+        previousPlayer = getScore.readLine().split(",");
+        getScore.close();
+        }
+        catch (Exception e){
+        previousPlayer[0] = "-1";
+        }
+        
+        return previousPlayer;
+    }
+}
+class Questions
+    {
+        String question;               // who has biggest land
+        String [] possibleAnswers;     // bdesh , spain ,japan , morroco
+        int [] scores;                 // 0     ,  3    ,  5   ,   10
+    }
